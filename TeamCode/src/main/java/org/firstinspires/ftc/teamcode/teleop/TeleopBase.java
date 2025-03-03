@@ -1,0 +1,35 @@
+package org.firstinspires.ftc.teamcode.teleop;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.robots.DriveBase;
+
+/**
+ * This op mode is for a simple base setup that uses just four motors and mecanum wheels
+ * For this code, there are no other motors or servos, and no odometry tracking
+ */
+@TeleOp(name="Basic Drive Train", group="Test Modes")
+public class TeleopBase extends LinearOpMode
+{
+    private DriveBase robot = new DriveBase(this);
+
+    public void runOpMode()
+    {
+        robot.init();
+
+        waitForStart();
+
+        while(opModeIsActive())
+        {
+            double axial = -gamepad1.left_stick_y;   // Forward on left stick yields negative val
+            double lateral = gamepad1.left_stick_x;
+            double yaw = gamepad1.right_stick_x;
+
+            robot.drive(axial,lateral,yaw);
+
+            telemetry.update();
+        }
+    }
+
+}
