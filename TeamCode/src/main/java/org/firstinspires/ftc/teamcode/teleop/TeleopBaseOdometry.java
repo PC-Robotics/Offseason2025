@@ -14,6 +14,8 @@ public class TeleopBaseOdometry extends LinearOpMode
     {
         robot.init();
 
+        robot.resetPositionAndOdometry();
+
         waitForStart();
 
         while(opModeIsActive())

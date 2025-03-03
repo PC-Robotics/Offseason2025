@@ -88,4 +88,9 @@ public class DriveBaseOdometry extends DriveBase
 
     }
 
+    public void resetPositionAndOdometry()
+    {
+        odo.resetPosAndIMU();
+    }
+
 }
