@@ -9,11 +9,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  */
 public class DriveBase
 {
-    private LinearOpMode myOpMode = null;
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftRearDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightRearDrive = null;
+    protected LinearOpMode myOpMode = null;
+    protected DcMotor leftFrontDrive = null;
+    protected DcMotor leftRearDrive = null;
+    protected DcMotor rightFrontDrive = null;
+    protected DcMotor rightRearDrive = null;
 
     public DriveBase (LinearOpMode opMode)
     {
