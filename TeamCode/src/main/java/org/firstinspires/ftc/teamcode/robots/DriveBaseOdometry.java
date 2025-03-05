@@ -55,6 +55,8 @@ public class DriveBaseOdometry extends DriveBase
         myOpMode.telemetry.addData("Y offset", odo.getYOffset());
         myOpMode.telemetry.addData("Device Version Number:", odo.getDeviceVersion());
         myOpMode.telemetry.addData("Device Scalar", odo.getYawScalar());
+
+        super.init();
     }
 
     public void updateOdometryTelemetry()

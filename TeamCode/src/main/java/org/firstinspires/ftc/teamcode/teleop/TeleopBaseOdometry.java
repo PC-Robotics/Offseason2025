@@ -20,15 +20,28 @@ public class TeleopBaseOdometry extends LinearOpMode
 
         while(opModeIsActive())
         {
-            double axial = -gamepad1.left_stick_y;   // Forward on left stick yields negative val
-            double lateral = gamepad1.left_stick_x;
-            double yaw = gamepad1.right_stick_x;
+            gamepad1Controls();
+            gamepad2Controls();
 
-            robot.drive(axial,lateral,yaw);
-
+            // This command does NOT store the current position anywhere, it just updates display
             robot.updateOdometryTelemetry();
 
             telemetry.update();
         }
     }
+
+    public void gamepad1Controls()
+    {
+        double axial = -gamepad1.left_stick_y;   // Forward on left stick yields negative val
+        double lateral = gamepad1.left_stick_x;
+        double yaw = gamepad1.right_stick_x;
+
+        robot.drive(axial,lateral,yaw);
+    }
+    public void gamepad2Controls()
+    {
+
+    }
+
+
 }
