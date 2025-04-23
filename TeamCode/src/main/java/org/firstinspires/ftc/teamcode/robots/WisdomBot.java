@@ -28,36 +28,33 @@ public class WisdomBot extends DriveBase {
         super.init();
     }
 
-    public void rotateWrist(double power){
-        intakeWrist.setPower(power*power*power);
-        myOpMode.telemetry.addData("Intake Wrist", intakeWrist.getCurrentPosition());
+    public void intake(double power){
+        intake.setPower(power);
     }
 
-    public void linearSlide (boolean up, boolean down){
-        if(up){
-            rightLift.setPower(1);
-            leftLift.setPower(1);
-        }else if(down){
-            rightLift.setPower(-1);
-            leftLift.setPower(-1);
-        }else {
-            rightLift.setPower(0.08);
-            leftLift.setPower(0.08);
+    public void linearSlide (double power){
+        if(leftLift.getCurrentPosition() == 0){
+            power = 0;
         }
+        if(leftLift.getCurrentPosition() == maxHeight){
+            power = 0;
+        }
+        rightLift.setPower(power);
+        leftLift.setPower(power);
         myOpMode.telemetry.addData("Left Lift Position",leftLift.getCurrentPosition());
         myOpMode.telemetry.addData("Right Lift Position",rightLift.getCurrentPosition());
     }
 
-    public void intake(boolean forward, boolean backwards){
+    public void rotateWrist(boolean forward, boolean backwards){
         if(forward){
-            intake.setPower(1);
-            intake.setPower(1);
+            intakeWrist.setPower(1);
+            intakeWrist.setPower(1);
         }else if(backwards){
-            intake.setPower(-1);
-            intake.setPower(-1);
+            intakeWrist.setPower(-1);
+            intakeWrist.setPower(-1);
         }else{
-            intake.setPower(0);
-            intake.setPower(0);
+            intakeWrist.setPower(0);
+            intakeWrist.setPower(0);
         }
     }
 }

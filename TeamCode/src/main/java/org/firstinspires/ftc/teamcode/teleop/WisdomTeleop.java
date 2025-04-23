@@ -20,17 +20,16 @@ public class WisdomTeleop extends LinearOpMode {
             double axial = -gamepad1.left_stick_y;   // Forward on left stick yields negative val
             double lateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x;
-            double wristReverse = gamepad1.left_trigger;
-            double wristForward = gamepad1.right_trigger;
-            boolean liftUp = gamepad1.right_bumper;
-            boolean liftDown = gamepad1.left_bumper;
-            boolean intakeForward = gamepad1.dpad_up;
-            boolean intakeBackwards = gamepad1.dpad_down;
+            boolean wristReverse = gamepad2.left_bumper;
+            boolean wristForward = gamepad2.right_bumper;
+            double liftUp = -gamepad2.right_stick_y;
+            double intakeForward = gamepad2.right_trigger;
+            double intakeBackwards = gamepad2.left_trigger;
 
             robot.drive(axial,lateral,yaw);
-            robot.linearSlide(liftUp, liftDown);
-            robot.rotateWrist(wristForward-wristReverse);
-            robot.intake(intakeForward, intakeBackwards);
+            robot.linearSlide(liftUp);
+            robot.rotateWrist(wristForward, wristReverse);
+            robot.intake(intakeForward - intakeBackwards);
 
             telemetry.update();
         }
