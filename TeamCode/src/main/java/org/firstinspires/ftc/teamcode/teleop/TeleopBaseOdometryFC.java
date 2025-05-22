@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robots.DriveBaseOdometry;
 
 @TeleOp(name="Basic Drive with Odometry Tracking",group="Test Modes")
-public class TeleopBaseOdometry extends LinearOpMode
+public class TeleopBaseOdometryFC extends LinearOpMode
 {
-    private DriveBaseOdometry robot = new DriveBaseOdometry(this);
+    private DriveBaseOdometry robot = new DriveBaseOdometry(this, true);
 
     public void runOpMode()
     {
@@ -23,13 +23,16 @@ public class TeleopBaseOdometry extends LinearOpMode
             gamepad1Controls();
             gamepad2Controls();
 
-            // This command does NOT store the current position anywhere, it just updates display
+            robot.updatePosition();
             robot.updateOdometryTelemetry();
 
             telemetry.update();
         }
     }
 
+    /**
+     * Stores all logic corresponding to Gamepad 1 [Driver]
+     */
     public void gamepad1Controls()
     {
         double axial = -gamepad1.left_stick_y;   // Forward on left stick yields negative val
@@ -38,9 +41,17 @@ public class TeleopBaseOdometry extends LinearOpMode
 
         robot.drive(axial,lateral,yaw);
     }
+
+    /**
+     * Stores all logic corresponding to Gamepad 2 [Operator]
+     */
     public void gamepad2Controls()
     {
-
+        // Resets the robot telemetry to position (0,0), heading 0 degrees
+        if(gamepad2.cross)
+        {
+            robot.resetPositionAndOdometry();
+        }
     }
 
 

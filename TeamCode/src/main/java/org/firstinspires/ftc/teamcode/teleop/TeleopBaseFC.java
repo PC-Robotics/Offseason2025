@@ -9,10 +9,10 @@ import org.firstinspires.ftc.teamcode.robots.DriveBase;
  * This op mode is for a simple base setup that uses just four motors and mecanum wheels
  * For this code, there are no other motors or servos, and no odometry tracking
  */
-@TeleOp(name="Basic Control", group="Test Modes")
-public class TeleopBase extends LinearOpMode
+@TeleOp(name="Basic FC Control", group="Test Modes")
+public class TeleopBaseFC extends LinearOpMode
 {
-    private DriveBase robot = new DriveBase(this, false);
+    private DriveBase robot = new DriveBase(this, true);
 
     public void runOpMode()
     {

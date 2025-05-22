@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.robots;
 
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
  * Simplistic drive base capable of using mecanum wheels and driving around
@@ -10,14 +14,20 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class DriveBase
 {
     protected LinearOpMode myOpMode = null;
+
+    protected boolean fieldCentric = false;
+
     protected DcMotor leftFrontDrive = null;
     protected DcMotor leftRearDrive = null;
     protected DcMotor rightFrontDrive = null;
     protected DcMotor rightRearDrive = null;
 
-    public DriveBase (LinearOpMode opMode)
+    protected IMU imu = null;
+
+    public DriveBase (LinearOpMode opMode, boolean isFC)
     {
         myOpMode = opMode;
+        fieldCentric = isFC;
     }
 
     /**
@@ -48,6 +58,14 @@ public class DriveBase
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightRearDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        // TODO: Update this based on how the hub is mounted on the robot
+        imu = myOpMode.hardwareMap.get(IMU.class,"imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+
+        imu.initialize(parameters);
+
         myOpMode.telemetry.addData("Status","Initialized");
         myOpMode.telemetry.update();
 
@@ -69,6 +87,21 @@ public class DriveBase
         double rightFrontPower = axial - lateral - yaw;
         double leftRearPower   = axial - lateral + yaw;
         double rightRearPower  = axial + lateral - yaw;
+
+        if(fieldCentric)
+        {
+            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            double rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
+            double rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
+
+            rotX = rotX * 1.1; //Counteract imperfect strafing
+
+            leftFrontPower = (rotY + rotX + yaw);
+            leftRearPower = (rotY - rotX + yaw);
+            rightFrontPower = (rotY - rotX - yaw);
+            rightRearPower = (rotY + rotX - yaw);
+        }
 
         // Normalize the values so no wheel power exceeds 100%
         // This ensures that the robot maintains the desired motion.

@@ -14,9 +14,11 @@ public class DriveBaseOdometry extends DriveBase
 
     private GoBildaPinpointDriver odo;
 
-    public DriveBaseOdometry (LinearOpMode opMode)
+    private Pose2D robotPosition;
+
+    public DriveBaseOdometry (LinearOpMode opMode, boolean isFC)
     {
-        super(opMode);
+        super(opMode, isFC);
     }
 
     public void init()
@@ -56,23 +58,34 @@ public class DriveBaseOdometry extends DriveBase
         myOpMode.telemetry.addData("Device Version Number:", odo.getDeviceVersion());
         myOpMode.telemetry.addData("Device Scalar", odo.getYawScalar());
 
+        robotPosition = odo.getPosition();
+
         super.init();
+    }
+
+    /**
+     * Updates the position of the robot based on the odometry pod readings
+     */
+    public void updatePosition()
+    {
+        robotPosition = odo.getPosition();
     }
 
     public void updateOdometryTelemetry()
     {
         /*
-        gets the current Position (x & y in mm, and heading in degrees) of the robot, and prints it.
+        Prints the current Position (x & y in inches, and heading in degrees) of the robot
+        Can alter the DistanceUnit to display MM or INCH
         */
-        Pose2D pos = odo.getPosition();
-        String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+        String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", robotPosition.getX(DistanceUnit.INCH),
+                robotPosition.getY(DistanceUnit.INCH), robotPosition.getHeading(AngleUnit.DEGREES));
         myOpMode.telemetry.addData("Position", data);
 
         /*
-        gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
+        gets the current Velocity (x & y in in/sec and heading in degrees/sec) and prints it.
         */
         Pose2D vel = odo.getVelocity();
-        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
+        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.INCH), vel.getY(DistanceUnit.INCH), vel.getHeading(AngleUnit.DEGREES));
         myOpMode.telemetry.addData("Velocity", velocity);
 
          /*
@@ -95,4 +108,26 @@ public class DriveBaseOdometry extends DriveBase
         odo.resetPosAndIMU();
     }
 
+    public void setRobotPosition(Pose2D position)
+    {
+        odo.setPosition(position);
+    }
+
+    public Pose2D getRobotPosition()
+    {
+        return robotPosition;
+    }
+
+    public double getXPosition(DistanceUnit unit)
+    {
+        return robotPosition.getX(unit);
+    }
+    public double getYPosition(DistanceUnit unit)
+    {
+        return robotPosition.getY(unit);
+    }
+    public double getHeading(AngleUnit unit)
+    {
+        return robotPosition.getHeading(unit);
+    }
 }
