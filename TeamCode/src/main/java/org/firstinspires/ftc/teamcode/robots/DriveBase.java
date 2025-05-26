@@ -61,7 +61,7 @@ public class DriveBase
         // TODO: Update this based on how the hub is mounted on the robot
         imu = myOpMode.hardwareMap.get(IMU.class,"imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         imu.initialize(parameters);
@@ -87,6 +87,8 @@ public class DriveBase
         double rightFrontPower = axial - lateral - yaw;
         double leftRearPower   = axial - lateral + yaw;
         double rightRearPower  = axial + lateral - yaw;
+
+        // The following code was taken from gm0.org
 
         if(fieldCentric)
         {
