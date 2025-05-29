@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.support;
 
+@Config
 public class ConstantsPID
 {
     // Constants dealing with moving forward and backward
