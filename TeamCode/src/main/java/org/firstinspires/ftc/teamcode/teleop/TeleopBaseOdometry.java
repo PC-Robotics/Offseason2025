@@ -22,8 +22,7 @@ public class TeleopBaseOdometry extends LinearOpMode {
             gamepad1Controls();
             gamepad2Controls();
 
-            robot.updatePosition();
-            robot.updateOdometryTelemetry();
+            robot.updatePositionAndTelemetry();
 
             telemetry.update();
         }

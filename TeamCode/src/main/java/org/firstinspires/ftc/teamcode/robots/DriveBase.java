@@ -81,43 +81,24 @@ public class DriveBase
     {
         double max;
 
-        // Combine the joystick requests for each axis-motion to determine each wheel's power.
-        // Set up a variable for each drive wheel to save the power level for telemetry.
-        double leftFrontPower  = axial + lateral + yaw;
-        double rightFrontPower = axial - lateral - yaw;
-        double leftRearPower   = axial - lateral + yaw;
-        double rightRearPower  = axial + lateral - yaw;
-
-        // The following code was taken from gm0.org
-
+        // This conversion is based on gmZero.org code
         if(fieldCentric)
         {
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             double rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
-            double rotY = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
+            axial = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
 
-            rotX = rotX * 1.1; //Counteract imperfect strafing
-
-            leftFrontPower = (rotY + rotX + yaw);
-            leftRearPower = (rotY - rotX + yaw);
-            rightFrontPower = (rotY - rotX - yaw);
-            rightRearPower = (rotY + rotX - yaw);
+            lateral = rotX;
         }
 
-        // Normalize the values so no wheel power exceeds 100%
-        // This ensures that the robot maintains the desired motion.
-        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftRearPower));
-        max = Math.max(max, Math.abs(rightRearPower));
-
-        if(max > 1.0)
-        {
-            leftRearPower /= max;
-            leftFrontPower /= max;
-            rightRearPower /= max;
-            rightFrontPower /= max;
-        }
+        // Combine the joystick requests for each axis-motion to determine each wheel's power.
+        // Set up a variable for each drive wheel to save the power level for telemetry.
+        double denominator = Math.max(Math.abs(axial)+Math.abs(lateral)+Math.abs(yaw),1);
+        double leftFrontPower  = (axial + lateral + yaw)/denominator;
+        double leftRearPower   = (axial - lateral + yaw)/denominator;
+        double rightFrontPower = (axial - lateral - yaw)/denominator;
+        double rightRearPower  = (axial + lateral - yaw)/denominator;
 
         // Apply the power to the motors
         leftFrontDrive.setPower(leftFrontPower);
@@ -128,5 +109,6 @@ public class DriveBase
         // Add data to the telemetry for displaying the current motor powers
         myOpMode.telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         myOpMode.telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftRearPower, rightRearPower);
+        myOpMode.telemetry.addData("Heading",imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
     }
 }

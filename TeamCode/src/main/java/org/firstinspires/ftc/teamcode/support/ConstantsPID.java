@@ -8,7 +8,7 @@ public class ConstantsPID
     public static double DRIVE_KD = 0;
     public static final double DRIVE_TOLERANCE = 0.5;
     public static final double DRIVE_DEADBAND = 0.25; // must be less than tolerance
-    public static final double DRIVE_OUTPUTLIMIT = 0.8;
+    public static final double DRIVE_MAX_AUTO = 0.8;
 
 
     // Constants dealing with moving side to side
@@ -17,7 +17,7 @@ public class ConstantsPID
     public static double STRAFE_KD = 0;
     public static final double STRAFE_TOLERANCE = 0.5;
     public static final double STRAFE_DEADBAND = 0.25; //must be less than tolerance
-    public static final double STRAFE_OUTPUTLIMIT = 0.8;
+    public static final double STRAFE_MAX_AUTO = 0.8;
 
 
     // Constants dealing with turning
@@ -26,6 +26,6 @@ public class ConstantsPID
     public static double YAW_KD = 0;
     public static final double YAW_TOLERANCE = 1;
     public static final double YAW_DEADBAND = 0.5;
-    public static final double YAW_OUTPUTLIMIT = 0.8;
+    public static final double YAW_MAX_AUTO = 0.8;
 
 }

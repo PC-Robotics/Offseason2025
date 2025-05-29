@@ -34,6 +34,7 @@ public class DriveBaseOdometry extends DriveBase
         the tracking point the Y (strafe) odometry pod is. forward of center is a positive number,
         backwards is a negative number.
          */
+        //TODO: Set the appropriate offets based on your build
         odo.setOffsets(-84.0, -168.0); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
@@ -42,7 +43,8 @@ public class DriveBaseOdometry extends DriveBase
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per mm of your odometry pod.
          */
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        //TODO: Choose the appropriate pod type
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         //odo.setEncoderResolution(13.26291192);
 
 
@@ -51,6 +53,7 @@ public class DriveBaseOdometry extends DriveBase
         increase when you move the robot forward. And the Y (strafe) pod should increase when
         you move the robot to the left.
          */
+        //TODO: Run the simple odometry teleop and pay attention to telemetry values to make sure the directions are set correctly
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         myOpMode.telemetry.addData("X offset", odo.getXOffset());
@@ -61,6 +64,12 @@ public class DriveBaseOdometry extends DriveBase
         robotPosition = odo.getPosition();
 
         super.init();
+    }
+
+    public void updatePositionAndTelemetry()
+    {
+        updatePosition();
+        updateOdometryTelemetry();
     }
 
     /**

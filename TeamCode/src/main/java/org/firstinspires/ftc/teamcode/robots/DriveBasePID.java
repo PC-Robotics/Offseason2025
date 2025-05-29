@@ -2,68 +2,124 @@ package org.firstinspires.ftc.teamcode.robots;
 
 import static org.firstinspires.ftc.teamcode.support.ConstantsPID.*;
 
-import static java.lang.Math.signum;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.support.PIDController;
 
 public class DriveBasePID extends DriveBaseOdometry
 {
-    private double headingIntegral = 0;
-    private double lastErrorHeading = 0;
-    private double lastErrorDrive = 0;
+    private ElapsedTime holdTimer = new ElapsedTime();
 
-    public DriveBasePID(LinearOpMode opMode, boolean isFC)
+    private PIDController driveController = new PIDController(DRIVE_KP,DRIVE_KI,DRIVE_KD,DRIVE_MAX_AUTO,DRIVE_TOLERANCE,DRIVE_DEADBAND,false);
+    private PIDController strafeController = new PIDController(STRAFE_KP,STRAFE_KI,STRAFE_KD,STRAFE_MAX_AUTO,STRAFE_TOLERANCE,STRAFE_DEADBAND, false);
+    private PIDController yawController = new PIDController(YAW_KP,YAW_KI,YAW_KD,YAW_MAX_AUTO,YAW_TOLERANCE,YAW_DEADBAND,true);
+
+    public DriveBasePID(LinearOpMode mode,boolean isFC)
     {
-        super(opMode, isFC);
+        super(mode,isFC);
     }
 
-    public double pidHeading(double target, double kp, double ki, double kd, double current)
+    public void init()
     {
-        double error = target - current;
-        headingIntegral += error;
-        double derivative = error - lastErrorHeading;
-        while (error > 180) error -= 360;
-        while (error <= -180) error += 360;
-
-        double correction = (error*kp) + (headingIntegral * ki) + (derivative * kd);
-        lastErrorHeading = error;
-        return correction;
+        super.init();
     }
 
-    public double pfdDrive(double kp, double kd, double kf, double error)
+    public void forward(double distanceInches, double power, double holdTime)
     {
-        double derivative = error - lastErrorDrive;
-        double correction = (error * kp) + (derivative * kd);
-        correction += signum(error)*kf;
-        lastErrorDrive = error;
-        return correction;
+        driveController.reset(getYPosition(DistanceUnit.INCH)+distanceInches,power);
+        strafeController.reset(getXPosition(DistanceUnit.INCH));
+        yawController.reset();
+        holdTimer.reset();
+
+        while (myOpMode.opModeIsActive())
+        {
+            updatePositionAndTelemetry();
+
+            drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            if(driveController.isInPosition() && yawController.isInPosition())
+            {
+                if(holdTimer.time() > holdTime)  break;
+            }
+            else holdTimer.reset();
+
+            myOpMode.sleep(10);
+        }
+
+        drive(0,0,0);
     }
 
-    /**
-     * Provide the robot with a desired location and it will attempt to drive there
-     * @param targetX - Target X position in Inches
-     * @param targetY - Target Y position in Inches
-     * @param targetH - Target Heading in Degrees
-     */
-    public void goToPosition(double targetX, double targetY, double targetH)
+    public void strafe(double distanceInches, double power, double holdTime)
     {
-        updatePosition();
+        driveController.reset(getYPosition(DistanceUnit.INCH));
+        strafeController.reset(getXPosition(DistanceUnit.INCH)+distanceInches,power);
+        yawController.reset();
+        holdTimer.reset();
 
-        double xDistance = targetX - getXPosition(DistanceUnit.INCH);
-        double yDistance = targetY - getYPosition(DistanceUnit.INCH);
+        while (myOpMode.opModeIsActive())
+        {
+            updatePositionAndTelemetry();
 
-        double rotatedX = xDistance * Math.cos(-getHeading(AngleUnit.RADIANS)) - yDistance * Math.sin(-getHeading(AngleUnit.RADIANS));
-        double rotatedY = xDistance * Math.sin(-getHeading(AngleUnit.RADIANS)) + yDistance * Math.cos(-getHeading(AngleUnit.RADIANS));
+            drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
 
-        double driveCorrection = pfdDrive(DRIVE_KP,DRIVE_KD,0,rotatedX);
-        double strafeCorrection = pfdDrive(STRAFE_KP,STRAFE_KD,0,rotatedY);
-        double inputTurn = pidHeading(targetH, YAW_KP,YAW_KI,YAW_KD,getHeading(AngleUnit.DEGREES));
+            if(strafeController.isInPosition() && yawController.isInPosition())
+            {
+                if(holdTimer.time() > holdTime)  break;
+            }
+            else holdTimer.reset();
 
-        drive(driveCorrection,strafeCorrection,inputTurn);
+            myOpMode.sleep(10);
+        }
+
+        drive(0,0,0);
+    }
+
+    public void turnTo(double headingDegree, double power, double holdTime)
+    {
+        yawController.reset(headingDegree,power);
+        while(myOpMode.opModeIsActive())
+        {
+            updatePositionAndTelemetry();
+
+            drive(0,0,yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            if(yawController.isInPosition())
+            {
+                if(holdTimer.time() > holdTime) break;
+            }
+            else holdTimer.reset();
+            // Test if needed
+            myOpMode.sleep(10);
+        }
+
+        // Test if needed
+        drive(0,0,0);
+    }
+
+    public void goToPosition(double yLocation, double xLocation, double headingDegree, double power, double holdTime)
+    {
+        driveController.reset(yLocation, power);
+        strafeController.reset(xLocation, power);
+        yawController.reset(headingDegree, power);
+
+        while(myOpMode.opModeIsActive())
+        {
+            updatePositionAndTelemetry();
+
+            drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            if(driveController.isInPosition() && strafeController.isInPosition() && yawController.isInPosition())
+            {
+                if(holdTimer.time() > holdTime) break;
+            }
+            else holdTimer.reset();
+
+            myOpMode.sleep(10);
+        }
+
+        drive(0,0,0);
     }
 }
