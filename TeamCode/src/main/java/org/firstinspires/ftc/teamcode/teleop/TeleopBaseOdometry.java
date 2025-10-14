@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robots.DriveBaseOdometry;
 
 @TeleOp(name="Odometry Drive RC",group="Test Modes")
-public class TeleopBaseOdometry extends LinearOpMode {
+public class TeleopBaseOdometry extends LinearOpMode
+{
     private DriveBaseOdometry robot = new DriveBaseOdometry(this, false);
 
     public void runOpMode()
@@ -19,10 +20,10 @@ public class TeleopBaseOdometry extends LinearOpMode {
 
         while(opModeIsActive())
         {
+            robot.updatePositionAndTelemetry();
+
             gamepad1Controls();
             gamepad2Controls();
-
-            robot.updatePositionAndTelemetry();
 
             telemetry.update();
         }
@@ -51,6 +52,4 @@ public class TeleopBaseOdometry extends LinearOpMode {
             robot.resetPositionAndOdometry();
         }
     }
-
-
 }

@@ -23,6 +23,18 @@ public class DriveBaseOdometry extends DriveBase
 
     public void init()
     {
+        super.init();
+
+        robotPosition = odo.getPosition();
+    }
+
+    /**
+     * Using the GoBilda PinPoint odometry instead of the internal IMU
+     * Overrides the setup of IMU in DriveBase.
+     * Plug PinPoint odometry into I2C slot 0.
+     */
+    @Override
+    protected void setupOdometry() {
         // Initialize the hardware map using the same name that is used on the driver station
         odo = myOpMode.hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 
@@ -61,9 +73,6 @@ public class DriveBaseOdometry extends DriveBase
         myOpMode.telemetry.addData("Device Version Number:", odo.getDeviceVersion());
         myOpMode.telemetry.addData("Device Scalar", odo.getYawScalar());
 
-        robotPosition = odo.getPosition();
-
-        super.init();
     }
 
     public void updatePositionAndTelemetry()
@@ -135,6 +144,8 @@ public class DriveBaseOdometry extends DriveBase
     {
         return robotPosition.getY(unit);
     }
+
+    @Override
     public double getHeading(AngleUnit unit)
     {
         return robotPosition.getHeading(unit);

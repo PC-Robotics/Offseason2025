@@ -20,10 +20,10 @@ public class TeleopBaseOdometryFC extends LinearOpMode
 
         while(opModeIsActive())
         {
+            robot.updatePositionAndTelemetry();
+
             gamepad1Controls();
             gamepad2Controls();
-
-            robot.updatePositionAndTelemetry();
 
             telemetry.update();
         }
@@ -52,6 +52,4 @@ public class TeleopBaseOdometryFC extends LinearOpMode
             robot.resetPositionAndOdometry();
         }
     }
-
-
 }

@@ -58,6 +58,20 @@ public class DriveBase
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightRearDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        // Moved from base code into a new function to be overwritten if using PinPoint Odometry
+        setupOdometry();
+
+        myOpMode.telemetry.addData("Status","Initialized");
+        myOpMode.telemetry.update();
+
+    }
+
+    /**
+     * Used to track the rotation of the robot.
+     * If using the pinpoint odometry, this will be overwritten and not called.
+     */
+    protected void setupOdometry()
+    {
         // TODO: Update this based on how the hub is mounted on the robot
         imu = myOpMode.hardwareMap.get(IMU.class,"imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -65,11 +79,8 @@ public class DriveBase
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         imu.initialize(parameters);
-
-        myOpMode.telemetry.addData("Status","Initialized");
-        myOpMode.telemetry.update();
-
     }
+
 
     /**
      * Standard POV Mecanum drive code
@@ -84,7 +95,7 @@ public class DriveBase
         // This conversion is based on gmZero.org code
         if(fieldCentric)
         {
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            double botHeading = getHeading(AngleUnit.RADIANS);
 
             double rotX = lateral * Math.cos(-botHeading) - axial * Math.sin(-botHeading);
             axial = lateral * Math.sin(-botHeading) + axial * Math.cos(-botHeading);
@@ -110,5 +121,10 @@ public class DriveBase
         myOpMode.telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         myOpMode.telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftRearPower, rightRearPower);
         myOpMode.telemetry.addData("Heading",imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+    }
+
+    protected double getHeading(AngleUnit unit)
+    {
+        return imu.getRobotYawPitchRollAngles().getYaw(unit);
     }
 }
