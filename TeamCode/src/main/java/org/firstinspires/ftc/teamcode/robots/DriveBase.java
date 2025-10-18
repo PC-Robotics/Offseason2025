@@ -58,20 +58,6 @@ public class DriveBase
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightRearDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        // Moved from base code into a new function to be overwritten if using PinPoint Odometry
-        setupOdometry();
-
-        myOpMode.telemetry.addData("Status","Initialized");
-        myOpMode.telemetry.update();
-
-    }
-
-    /**
-     * Used to track the rotation of the robot.
-     * If using the pinpoint odometry, this will be overwritten and not called.
-     */
-    protected void setupOdometry()
-    {
         // TODO: Update this based on how the hub is mounted on the robot
         imu = myOpMode.hardwareMap.get(IMU.class,"imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -79,8 +65,11 @@ public class DriveBase
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
 
         imu.initialize(parameters);
-    }
 
+        myOpMode.telemetry.addData("Status","Initialized");
+        myOpMode.telemetry.update();
+
+    }
 
     /**
      * Standard POV Mecanum drive code

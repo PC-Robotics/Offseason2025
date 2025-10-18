@@ -29,8 +29,8 @@ public class DriveBasePID extends DriveBaseOdometry
 
     public void forward(double distanceInches, double power, double holdTime)
     {
-        driveController.reset(getYPosition(DistanceUnit.INCH)+distanceInches,power);
-        strafeController.reset(getXPosition(DistanceUnit.INCH));
+        driveController.reset(getXPosition(DistanceUnit.INCH)+distanceInches,power);
+        strafeController.reset(getYPosition(DistanceUnit.INCH));
         yawController.reset();
         holdTimer.reset();
 
@@ -38,7 +38,9 @@ public class DriveBasePID extends DriveBaseOdometry
         {
             updatePositionAndTelemetry();
 
-            drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+            drive(-driveController.getOutput(getXPosition(DistanceUnit.INCH)),-strafeController.getOutput(getYPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            myOpMode.telemetry.update();
 
             if(driveController.isInPosition() && yawController.isInPosition())
             {
@@ -54,8 +56,8 @@ public class DriveBasePID extends DriveBaseOdometry
 
     public void strafe(double distanceInches, double power, double holdTime)
     {
-        driveController.reset(getYPosition(DistanceUnit.INCH));
-        strafeController.reset(getXPosition(DistanceUnit.INCH)+distanceInches,power);
+        driveController.reset(getXPosition(DistanceUnit.INCH));
+        strafeController.reset(getYPosition(DistanceUnit.INCH)+distanceInches,power);
         yawController.reset();
         holdTimer.reset();
 
@@ -63,7 +65,9 @@ public class DriveBasePID extends DriveBaseOdometry
         {
             updatePositionAndTelemetry();
 
-            drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+            drive(-driveController.getOutput(getXPosition(DistanceUnit.INCH)),-strafeController.getOutput(getYPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            myOpMode.telemetry.update();
 
             if(strafeController.isInPosition() && yawController.isInPosition())
             {
@@ -85,6 +89,8 @@ public class DriveBasePID extends DriveBaseOdometry
             updatePositionAndTelemetry();
 
             drive(0,0,yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            myOpMode.telemetry.update();
 
             if(yawController.isInPosition())
             {
@@ -110,6 +116,8 @@ public class DriveBasePID extends DriveBaseOdometry
             updatePositionAndTelemetry();
 
             drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+
+            myOpMode.telemetry.update();
 
             if(driveController.isInPosition() && strafeController.isInPosition() && yawController.isInPosition())
             {
