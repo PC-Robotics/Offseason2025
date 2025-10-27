@@ -105,17 +105,41 @@ public class DriveBasePID extends DriveBaseOdometry
         drive(0,0,0);
     }
 
-    public void goToPosition(double yLocation, double xLocation, double headingDegree, double power, double holdTime)
+    /**
+     * Need to focus telemetry on error from position and rotating based on current heading
+     * Combination of code from the following sources
+     *  - SimplifiedOdometry (basic setup and PIDController)
+     *  - YouTube video on GoToPosition using the GoBilda PID Computer
+     *
+     * @param yLocation
+     * @param xLocation
+     * @param headingDegree
+     * @param power
+     * @param holdTime
+     */
+    public void goToPosition(double xLocation, double yLocation, double headingDegree, double power, double holdTime)
     {
-        driveController.reset(yLocation, power);
-        strafeController.reset(xLocation, power);
+        driveController.reset(xLocation, power);
+        strafeController.reset(yLocation, power);
         yawController.reset(headingDegree, power);
 
         while(myOpMode.opModeIsActive())
         {
             updatePositionAndTelemetry();
 
-            drive(-driveController.getOutput(getYPosition(DistanceUnit.INCH)),-strafeController.getOutput(getXPosition(DistanceUnit.INCH)), yawController.getOutput(getHeading(AngleUnit.DEGREES)));
+            double xDistance = xLocation - getXPosition(DistanceUnit.INCH);
+            double yDistance = yLocation - getYPosition(DistanceUnit.INCH);
+
+            double negativeRadianHeading = -getHeading(AngleUnit.RADIANS);
+
+            double rotatedX = xDistance * Math.cos(negativeRadianHeading) - yDistance * Math.sin(negativeRadianHeading);
+            double rotatedY = xDistance * Math.sin(negativeRadianHeading) + yDistance * Math.cos(negativeRadianHeading);
+
+            double axialPower = driveController.getOutputFromError(rotatedX);
+            double lateralPower = strafeController.getOutputFromError(rotatedY);
+            double yawPower = yawController.getOutput(getHeading(AngleUnit.DEGREES));
+
+            drive(axialPower,-lateralPower, -yawPower);
 
             myOpMode.telemetry.update();
 
